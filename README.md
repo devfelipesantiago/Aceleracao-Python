@@ -1,4 +1,5 @@
 # Aceleracao-Python
+
 Estudos de Python, Django e Flask
 
 Com esse curso vou aprender a:
@@ -14,7 +15,7 @@ Com esse curso vou aprender a:
 
 ## 🐍 Python
 
-#### O que é?
+### O que é?
 
 Python é uma linguagem de programação com foco em legibilidade e produtividade, criada para escrever código bom e fácil de manter de maneira rápida.
 
@@ -31,9 +32,11 @@ Caso python 3 não esteja instalado, utilize `sudo apt install python3`.
 Vamos verificar se deu tudo certo?
 
 Abra um terminal e digite
+
 ```python
 python3 --version.
 ```
+
 A saída deverá ser similar a apresentada abaixo:
 
 Python 3.8.0
