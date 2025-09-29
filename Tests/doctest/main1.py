@@ -12,6 +12,6 @@ def mean(numbers):
 
     """
     try:
-      return sum(numbers) / len(numbers)
+        return sum(numbers) / len(numbers)
     except ZeroDivisionError:
-       return 0
+        return 0
