@@ -1,0 +1,11 @@
+ignore_files:
+  - src/__init__.py
+  - src/hex_converter.py
+  - tests/__init__.py
+  - tests/trybe_test.py
+  - dev-requirements.txt
+  - pyproject.toml
+  - requirements.txt
+  - setup.cfg
+  - setup.py
+  - trybe-filter-repo.sh

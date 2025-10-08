@@ -1,0 +1,52 @@
+{
+  "requirements": [
+    {
+      "bonus": false,
+      "description": "1- Crie uma fixture",
+      "enabled": true,
+      "identifier": "test_expecting_the_same_fixture",
+      "order": 1,
+      "skill_ids": []
+    },
+    {
+      "bonus": false,
+      "description": "2- Use um marcador",
+      "enabled": true,
+      "identifier": "test_marker_dependency_mark",
+      "order": 2,
+      "skill_ids": []
+    },
+    {
+      "bonus": false,
+      "description": "3- Crie testes parametrizados",
+      "enabled": true,
+      "identifier": "test_parametrized",
+      "order": 3,
+      "skill_ids": []
+    },
+    {
+      "bonus": false,
+      "description": "4- Use fixtures builtin - `monkeypatch`",
+      "enabled": true,
+      "identifier": "test_use_of_monkeypatch",
+      "order": 4,
+      "skill_ids": []
+    },
+    {
+      "bonus": false,
+      "description": "5- Use fixtures builtin - `capsys`",
+      "enabled": true,
+      "identifier": "test_use_of_capsys",
+      "order": 5,
+      "skill_ids": []
+    },
+    {
+      "bonus": false,
+      "description": "6- Use fixtures builtin - `tmp_path`",
+      "enabled": true,
+      "identifier": "test_use_of_tmp_path",
+      "order": 6,
+      "skill_ids": []
+    }
+  ]
+}

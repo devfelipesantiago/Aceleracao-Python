@@ -1,0 +1,9 @@
+-r requirements.txt
+
+wheel==0.37.1
+black==22.1.0
+flake8==4.0.1
+pytest==7.0.1
+pytest-json==0.4.0
+rich==13.3.5
+pytest-dependency@git+https://github.com/betrybe/pytest-dependency@a2b5ff736d188c982ae7717653c240290bc2f0d3

@@ -1,0 +1,20 @@
+{
+  "requirements": [
+    {
+      "bonus": false,
+      "description": "1- Identifique e corrija os erros no arquivo `src/word_finder.py`",
+      "enabled": true,
+      "identifier": "test_spotify_final",
+      "order": 1,
+      "skill_ids": []
+    },
+    {
+      "bonus": false,
+      "description": "2- Identifique e corrija os erros no arquivo `src/spotify.py`",
+      "enabled": true,
+      "identifier": "test_lines_with_word_occurrences",
+      "order": 2,
+      "skill_ids": []
+    }
+  ]
+}
