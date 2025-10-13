@@ -1,0 +1,14 @@
+ignore_files:
+  - tests/test_estoque.py
+  - tests/test_produto.py
+  - tests/__init__.py
+  - tests/livro/__init__.py
+  - tests/livro/mocks.py
+  - tests/livro/conftest.py
+  - tests/descricao_livro/__init__.py
+  - tests/descricao_livro/mocks.py
+  - tests/descricao_livro/conftest.py
+  - dev-requirements.txt
+  - requirements.txt
+  - setup.cfg
+  - pyproject.toml

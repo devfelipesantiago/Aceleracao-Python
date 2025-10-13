@@ -17,3 +17,4 @@ Inferência de tipo
 - **Self**: entidade que permite, no Python, uma classe acessar os valores dos atributos de quem a invocou, como o this do JavaScript.
 - **Método construtor**: invocado sempre que se cria uma instância, ele coloca valores em atributos.
 - **Classes como tipos**: se a instância de uma classe é esperada como valor, ela pode ser usada para fazer tipagem estática.
+

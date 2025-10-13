@@ -2,11 +2,11 @@ class Classe:
     _atributo_da_classe = 1
 
     @classmethod
-    def seta_atributo_da_classe(cls, valor):
+    def seta_atributo_da_classe(cls, valor: int):
         cls._atributo_da_classe = valor
 
     @classmethod
-    def retorna_atributo_da_classe(cls):
+    def retorna_atributo_da_classe(cls) -> int:
         return cls._atributo_da_classe
 
 

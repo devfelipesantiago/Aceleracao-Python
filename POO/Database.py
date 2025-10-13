@@ -18,7 +18,7 @@ class database:
                 port = 5432
             else:
                 raise ValueError("invalid default `port` for unrecognized `dialect`")
-        if type(port) == str and not port.isnumeric():
+        if port is str and not port.isnumeric():
             raise ValueError("`port` must have a numeric value")
 
         self.connection_url = (
