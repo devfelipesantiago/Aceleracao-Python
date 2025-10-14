@@ -18,3 +18,6 @@ Inferência de tipo
 - **Método construtor**: invocado sempre que se cria uma instância, ele coloca valores em atributos.
 - **Classes como tipos**: se a instância de uma classe é esperada como valor, ela pode ser usada para fazer tipagem estática.
 
+![alt text](image.png)
+
+![alt text](image-1.png)
