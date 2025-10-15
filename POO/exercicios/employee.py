@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class Employee(ABC):
     @abstractmethod
     def calculate_bonus(self) -> float:
-        pass
+        raise NotImplementedError
 
 
 class Manager(Employee):
