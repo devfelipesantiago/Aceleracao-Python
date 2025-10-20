@@ -58,3 +58,17 @@ O que vou aprender?
 * Utilizar o módulo faker para gerar dados aleatórios em testes.
 * Manipular as configurações do Testador do VSCode.
 * Manipular as configurações do Debugger do VSCode
+
+## POO
+
+* Diferenciar os casos de uso das diferentes formas de checagem de tipos em Python.
+* Utilizar a tipagem estática em códigos Python
+* Utilizar Classes, Construtores, Instâncias, Atributos e Métodos em Python
+* Reconhecer uma aplicação em Python que utiliza o paradigma de Programação Orientada a Objetos.
+
+## Raspagem de dados
+
+* Realizar requisições web;
+* Analisar conteúdos HTML para extrair dados;
+* Aplicar técnicas de raspagem para evitar problemas como bloqueio de acesso;
+* Armazenar os dados obtidos em um banco de dados.

@@ -39,6 +39,7 @@ def test_simular_bug_divisao_por_zero():
 Fixtures são funções que preparam o "ambiente" necessário para seus testes. Pense nelas como a infraestrutura: elas podem fornecer dados, criar conexões com o banco de dados, ou, como nas suas anotações, simular caminhos de arquivo.
 
 ### 1. Fixture `tmp_path` (Diretórios Temporários)
+
 O `tmp_path` é perfeito para simular caminhos de arquivos ou diretórios que você precisa criar, escrever ou ler durante o teste, sem afetar seu sistema de arquivos real. Ele cria um diretório temporário exclusivo para cada teste e o limpa automaticamente depois.
 
 ```Python
@@ -63,6 +64,7 @@ def test_criacao_de_arquivo_temporario(tmp_path):
 ```
 
 ### 2. Fixture `monkeypatch` (Substituindo Objetos/Caminhos)
+
 O `monkeypatch` permite que você substitua temporariamente atributos, funções ou valores de módulos, classes ou dicionários. É o mecanismo ideal para "mockar" ou simular que um arquivo está em um lugar diferente ou que uma função demorada já retornou um valor.
 
 Combinação `tmp_path` e `monkeypatch`
@@ -96,6 +98,7 @@ def test_monkeypatch_caminho_atual(tmp_path, monkeypatch):
 ```
 
 ### 3. Criando Suas Próprias Fixtures (e `conftest.py`)
+
 Se você tem uma configuração complexa que precisa ser usada em vários testes, você deve criar uma Fixture personalizada.
 
 O arquivo `conftest.py` é o arquivo de configuração do pytest.
@@ -137,6 +140,7 @@ def test_usando_fixture_personalizada(usuario_padrao):
 ```
 
 ### 4. Testes Parametrizados
+
 Testes parametrizados (usando `@pytest.mark.parametrize`) permitem que você execute o mesmo código de teste várias vezes com diferentes conjuntos de dados (parâmetros). Isso é ótimo para testar muitos casos de uso (como entrada e saída esperada) com menos código repetitivo.
 
 ```Python
@@ -160,6 +164,7 @@ def test_soma_com_parametros(input_a, input_b, expected_output):
 ```
 
 ### 5. Ferramentas de Depuração com Testes
+
 Para depurar (debugar) o código do seu teste ou o código que ele está chamando, você pode usar a função pytest.set_trace() em qualquer lugar do seu código de teste.
 
 ```Python
