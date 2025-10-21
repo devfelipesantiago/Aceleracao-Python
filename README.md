@@ -27,14 +27,14 @@ Como instalar
 
 Versões mais atuais do ubuntu (ou similares) já vem com o python 3 instalado, e inclusive, a partir da versão 17.10, essa passa a ser a versão padrão do sistema.
 
-Caso python 3 não esteja instalado, utilize `sudo apt install python3`.
+Caso python 3 não esteja instalado, utilize `sudo apt install python`.
 
 Vamos verificar se deu tudo certo?
 
 Abra um terminal e digite
 
 ```python
-python3 --version.
+python --version.
 ```
 
 A saída deverá ser similar a apresentada abaixo:
@@ -49,21 +49,21 @@ O que vou aprender?
 * Criar seus próprios testes automatizados com o módulo **pytest**.
 * Simular cenários de bugs por meio de testes.
 * Executar conjuntos de testes de forma automática.
-* Utilizar fixtures de testes do pytest.
-* Criar suas próprias fixtures de teste.
+* Utilizar `fixtures` de testes do pytest.
+* Criar suas próprias `fixtures` de teste.
 * Criar testes parametrizados.
-* Utilizar ferramentas de depuração em conjunto com testes.
+* Utilizar ferramentas de **depuração** em conjunto com testes.
 * Aplicar o módulo unittest para criar mocks em testes.
-* Utilizar ferramentas de cobertura de testes em códigos Python.
+* Utilizar ferramentas de **cobertura de testes** em códigos Python.
 * Utilizar o módulo faker para gerar dados aleatórios em testes.
-* Manipular as configurações do Testador do VSCode.
-* Manipular as configurações do Debugger do VSCode
+* Manipular as configurações do `Testador` do VSCode.
+* Manipular as configurações do `Debugger` do VSCode
 
 ## POO
 
 * Diferenciar os casos de uso das diferentes formas de checagem de tipos em Python.
 * Utilizar a tipagem estática em códigos Python
-* Utilizar Classes, Construtores, Instâncias, Atributos e Métodos em Python
+* Utilizar `Classes`, `Construtores`, `Instâncias`, `Atributos` e Métodos em Python
 * Reconhecer uma aplicação em Python que utiliza o paradigma de Programação Orientada a Objetos.
 
 ## Raspagem de dados
@@ -72,3 +72,7 @@ O que vou aprender?
 * Analisar conteúdos HTML para extrair dados;
 * Aplicar técnicas de raspagem para evitar problemas como bloqueio de acesso;
 * Armazenar os dados obtidos em um banco de dados.
+* Realizar requisições web;
+* Analisar conteúdos `HTML` a fim de extrair dados;
+* Utilizar a ferramenta `Selenium` para extrair dados;
+* Utilizar a biblioteca `Beautiful Soup` para extrair dados;
