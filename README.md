@@ -83,3 +83,11 @@ O que vou aprender?
 * Realizar a ordenação e contagem de documentos resultantes de uma operação de recuperação de dados no MongoDB;
 * Realizar operações de recuperação de documentos refinadas no MongoDB através do uso de operadores de comparação;
 * Realizar operações de inserção de documentos no MongoDB através do uso do método `insert()`;
+
+## Flask
+
+* Definir o que é um banco de dados NoSQL.
+* Utilizar MongoDB por meio de um container Docker.
+* Realizar operações de recuperação e inserção de dados no MongoDB.
+* Instalar, configurar e gerenciar o ambiente Flask.
+* Utilizar o kit de ferramentas WSGI - Werkzeug.
