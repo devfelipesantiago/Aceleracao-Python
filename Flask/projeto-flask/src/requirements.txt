@@ -1,0 +1,3 @@
+Flask==lastest
+pymongo==lastest
+waitress==lastest
