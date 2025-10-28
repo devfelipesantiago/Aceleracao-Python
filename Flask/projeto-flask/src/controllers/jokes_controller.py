@@ -1,7 +1,16 @@
 # jokes_controller.py
+from enum import IntEnum
 from bson import ObjectId
 from flask import Blueprint, jsonify, request
 from models.joke_model import JokeModel
+
+
+class HTTPSTATUS(IntEnum):
+    OK = 200
+    Created = 201
+    NoContent = 204
+    NotFound = 404
+
 
 jokes_controller = Blueprint("jokes", __name__)
 # O primeiro parâmetro determina o nome da blueprint, já o segundo
@@ -43,16 +52,16 @@ def joke_random():
     # Exemplo de Validação
     if joke is None:
         # O Flask entende que o número após o jsonify, representa o Status HTTP
-        return jsonify({"error": "No jokes available"}), 404
+        return jsonify({"error": "No jokes available"}), HTTPSTATUS.NotFound
 
-    return jsonify(joke.to_dict()), 200
+    return jsonify(joke.to_dict()), HTTPSTATUS.OK
 
 
 @jokes_controller.route("/", methods=["POST"])
 def joke_post():
     new_joke = JokeModel(request.json)
     new_joke.save()
-    return jsonify(new_joke.to_dict()), 201
+    return jsonify(new_joke.to_dict()), HTTPSTATUS.Created
 
 
 @jokes_controller.route("/<id>", methods=["PUT"])
@@ -60,24 +69,24 @@ def joke_update(id: str):
     joke = _get_joke(id)
     # Exemplo de Validação
     if joke is None:
-        return jsonify({"error": "Joke not found"}), 404
+        return jsonify({"error": "Joke not found"}), HTTPSTATUS.NotFound
     joke.update(request.json)
-    return jsonify(joke.to_dict()), 200
+    return jsonify(joke.to_dict()), HTTPSTATUS.OK
 
 
 @jokes_controller.route("/<id>", methods=["GET"])
 def joke_show(id: str):
     joke = _get_joke(id)
     if joke is None:
-        return jsonify({"error": "Joke not found"}), 404
-    return jsonify(joke.to_dict()), 200
+        return jsonify({"error": "Joke not found"}), HTTPSTATUS.NotFound
+    return jsonify(joke.to_dict()), HTTPSTATUS.OK
 
 
 @jokes_controller.route("/<id>", methods=["DELETE"])
 def joke_delete(id: str):
     joke = _get_joke(id)
     if joke is None:
-        return jsonify({"error": "Joke not found"}), 404
+        return jsonify({"error": "Joke not found"}), HTTPSTATUS.NotFound
 
     joke.delete()
-    return jsonify(joke.to_dict()), 204
+    return jsonify(joke.to_dict()), HTTPSTATUS.NoContent
