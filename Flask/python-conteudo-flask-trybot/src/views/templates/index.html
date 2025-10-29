@@ -12,9 +12,9 @@
   <!-- {{url_for}} utilizado para importar uma imagem estática -->
   <img src="{{ url_for('static', filename='images/logo.png') }}" width="40%">
 
-  <form action="/" method="post">
+  <form action="/chat" method="post">
     {% if username and greeting %}
-    <p>Olá {{ username|capitalize|trim }}! {{ greeting }}!</p>
+    <p>Olá {{username|capitalize|trim}}! {{greeting}}, como você se chama?</p>
     {% endif %}
     <div class="send-box">
       <input type="text" name="username">

@@ -24,7 +24,7 @@ class JokeModel(AbstractModel):
         except IndexError:
             return None
 
-    # Define as regras de como o Objeto por virar um Dicionário
+    # Define as regras de como o Objeto vai virar um Dicionário
     def to_dict(self):
         return {
             "_id": str(self.data["_id"]),
