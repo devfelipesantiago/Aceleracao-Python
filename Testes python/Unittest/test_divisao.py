@@ -5,7 +5,7 @@ from divisao import divide
 class TestOperations(unittest.TestCase):
     def test_divide(self):
         self.assertEqual(divide(10, 2), 5)
-        self.assertEqual(divide(5, 2), 2.4)
+        self.assertEqual(divide(5, 2), 2.5)
 
     def test_divide_by_0(self):
         with self.assertRaises(ZeroDivisionError):
