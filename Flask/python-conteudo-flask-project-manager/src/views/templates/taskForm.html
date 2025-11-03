@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <form method="post" class="new-task">
+    <label for="nome">Atividade
+      <input type="text" name="nome" id="nome" required>
+    </label>
+    <label for="status">Status
+      <select name="status" id="status">
+        <option value="Não iniciado">Não iniciado</option>
+        <option value="Em progresso">Em progresso</option>
+        <option value="Concluído">Concluído</option>
+        <option value="Atrasado">Atrasado</option>
+      </select>
+    </label>
+    <label for="percentage">Porcentagem de conclusão
+      <input type="number" name="percentage" id="percentage" required>
+    </label>
+    <label for="description">Descrição da atividade
+      <textarea type="text" name="description" id="description" required></textarea>
+    </label>
+    <label for="deadline">Data limite
+      <input type="date" name="deadline" id="deadline" required>
+    </label>
+    <label for="responsible">Responsável
+      <input type="text" name="responsible" id="responsible" required>
+    </label>
+    <button type="submit">Enviar</button>
+  </form>
+</body>
+
+</html>
