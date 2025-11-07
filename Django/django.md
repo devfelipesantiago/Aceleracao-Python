@@ -451,3 +451,506 @@ class Customer(models.Model):
     address = models.CharField(max_length=200)
     phone = models.CharField(max_length=20)
 ```
+
+## Templates no Django
+
+Finalmente, chegou a hora de colocar a mão ~~na massa~~ no código! 🎉
+
+### Setup inicial
+
+Para começar, crie o ambiente virtual que será utilizado e faça a instalação dos pacotes que serão utilizados:
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install django
+pip install Pillow # biblioteca para trabalhar com imagens
+pip install mysqlclient # biblioteca para se comunicar com o MySQL
+```
+
+Em seguida, crie o projeto Django e a aplicação:
+
+```bash
+django-admin startproject event_manager .
+django-admin startapp events
+```
+
+Faça a instalação da aplicação dentro do projeto no arquivo `settings.py`:
+
+```diff
+# event_manager/settings.py
+...
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
++   'events',
+]
+
+...
+```
+
+Faça também a mudança para usar o MySQL como banco de dados:
+
+```diff
+# event_manager/settings.py
+...
+
+DATABASES = {
+    'default': {
+-       'ENGINE': 'django.db.backends.sqlite3',
++       'ENGINE': 'django.db.backends.mysql',
+-       'NAME': BASE_DIR / 'db.sqlite3',
++       'NAME': 'event_manager_database',
++       'USER': 'root',
++       'PASSWORD': 'password',
++       'HOST': '127.0.0.1',
++       'PORT': '3306',
+    }
+}
+
+...
+```
+
+Crie o arquivo para o script SQL dentro do diretório `./database`:
+
+```bash
+mkdir database && cd database
+touch 01_create_database.sql
+```
+
+Adicione o conteúdo do script para criação do banco de dados `event_manager_database`:
+
+```sql
+CREATE DATABASE IF NOT EXISTS event_manager_database;
+
+USE event_manager_database;
+```
+
+Crie o Dockerfile na raiz do projeto:
+
+```yaml
+FROM mysql:8.0.32
+
+ENV MYSQL_ROOT_PASSWORD password
+COPY ./database/01_create_database.sql /docker-entrypoint-initdb.d/data.sql01
+```
+
+Faça o _build_ da imagem, basta rodar o comando dentro da pasta do projeto que contém o arquivo Dockerfile.
+
+```bash
+docker build -t event-manager-db .
+```
+
+Execute o container e o script de criação do banco copiado no Dockerfile:
+
+```bash
+docker run -d -p 3306:3306 --name=event-manager-mysql-container -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=event_manager_database event-manager-db
+```
+
+Acesse o banco de dados pelo _Workbench_ e verifique se ele foi criado corretamente.
+
+Execute o comando `migrate` do Django:
+
+```bash
+python3 manage.py migrate
+```
+
+## Renderizando seu primeiro _template_
+
+Antes de começarmos, saiba que a configuração padrão do Django permite que você crie seus _templates_ dentro de cada uma das aplicações do seu projeto, e assim faremos.
+
+É possível alterar essa configuração para indicar diretórios específicos onde o Django deve procurar por _templates_. Por exemplo: na configuração abaixo, o Django irá buscar por _templates_ dentro do diretório `_templates_`, que está na raiz do projeto e não mais dentro de cada uma das aplicações do projeto. Lembre-se que você não precisa fazer a alteração abaixo.
+
+```diff
+# event_manager/settings.py
++ import os
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+-       'DIRS': [],
++       'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+```
+
+Agora sim, crie um novo diretório com nome `templates` dentro da aplicação `events` e, em seguida, crie o arquivo `home.html` dentro do novo diretório e inicie um arquivo HTML:
+
+```html
+<!--events/templates/home.html-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primeiro Template</title>
+</head>
+<body>
+    <h1> Meu primeiro template usando Django! </h1>
+</body>
+</html>
+```
+
+O próximo passo é implementar a view que irá fazer a renderização do _template_ criado. Acesse o arquivo `views.py` dentro do app `events` e escreva a função que fará essa tarefa:
+
+```python
+# events/views.py
+from django.shortcuts import render
+
+
+def index(request):
+    return render(request, 'home.html')
+```
+
+Prontinho! A função acima usa o método `render` do Django para renderizar o _template_ passado como segundo parâmetro `home.html`. O primeiro parâmetro, _request_, representa a requisição feita pela pessoa que usa a aplicação.
+
+Mas agora você pode estar se perguntando: _Como faço para invocar a função que foi implementada?_ 🤔
+
+A resposta é: através das rotas da nossa aplicação. A função criada será vinculada a uma das rotas da aplicação e, em seguida, serão incluídas nas rotas da aplicação no projeto.
+
+Crie o arquivo `urls.py` dentro da aplicação `events` e nele escreva o código abaixo:
+
+```python
+# events/urls.py
+from django.urls import path
+from events.views import index
+
+
+urlpatterns = [
+    path("", index, name="home-page")
+#   path("/rota-comentada", função-que-será-executada, name="nome-que-identifica-a-rota")
+]
+```
+
+No código acima, uma lista de rotas (`urlpatterns`) foi definida e cada uma das rotas é definida através da função `path`, que recebe três parâmetros: o primeiro é o caminho para a rota em si (`""` indica a raiz da aplicação `https://localhost:8000/`), o segundo é a função que será executada quando a rota for acessada e o terceiro é o nome que identifica essa rota.
+
+Agora, será necessário incluir as rotas da aplicação no projeto principal. Para isso, acesse o arquivo `urls.py` do projeto e faça a seguinte alteração:
+
+```python
+# event_manager/urls.py
+  from django.contrib import admin
+  from django.urls import path, include
+
+
+  urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('events.urls'))
+  ]
+```
+
+Com essas alterações você acabou de incluir as rotas da aplicação `events` no projeto `event_manager`, e fez isso usando o método `include` nativo do Django.
+
+Acabou! 🎉🎉🎉 Execute o servidor e acesse a rota `http://localhost:8000/` para ver o template criado sendo renderizado.
+
+> **Relembrando 🧠:** Para executar o servidor faça: `python3 manage.py runserver` no mesmo diretório em que se encontra o arquivo `manage.py`.
+
+## Herança de _templates_
+
+O Django permite que não se crie toda a estrutura de HTML para cada um dos _templates_. A DTL (_Django Template Language_) permite que se crie um template base que contém a estrutura essencial do HTML e lacunas intencionais - com cada template filho preenchendo as lacunas com o próprio conteúdo. Esse mecanismo é chamado de _Herança de templates_. Como exemplo, relembre o template `home.html` que criamos:
+
+```html
+<!-- events/templates/home.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primeiro Template</title>
+</head>
+<body>
+    <h1> Meu primeiro template usando Django! </h1>
+</body>
+</html>
+```
+
+Para ver a herança acontecendo na prática, copie todo o conteúdo desse arquivo e cole dentro de um novo arquivo HTML chamado `base.html` dentro do diretório `events/templates`.
+
+Substitua, em seguida, o conteúdo da tag `title` (_Primeiro Template_) por `{% block title %} {% endblock %}`, além disso, também substitua a linha da tag `h1` por `{% block content %} {% endblock %}`. Ao final dessas alterações o arquivo `base.html` fica assim:
+
+```html
+<!-- events/templates/base.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {% endblock %}</title>
+</head>
+<body>
+    {% block content %} {% endblock %}
+</body>
+</html>
+```
+
+A sintaxe `{% %}` indica que está sendo usada uma **Tag de template** do DTL. Ela é a **lacuna** que mencionamos mais cedo - um template filho irá preenchê-la. Nesse caso, usamos a tag `block`. Existem muitas **Tags de template** já implementadas no DTL. Você pode conferir todas as tags nativas do DTL na [documentação oficial](https://docs.djangoproject.com/pt-br/4.2/ref/templates/builtins/).
+
+Ao fazer essas alterações, foram criados blocos vazios que poderão ser preenchidos por aqueles _templates_ que herdarem o arquivo `base.html`. Acima, criamos dois blocos - um chamado _title_ e outro chamado _content_ - para escrever o título da página que será exibida e para colocar todo o conteúdo HTML que se quer exibir, respectivamente.
+
+Para usar a herança de _template_, faça o seguinte:
+
+1. Vá no template filho e inclua no seu cabeçalho a seguinte sintaxe: `{% extends 'base.html' %}`, onde se usa a palavra reservada `extends` seguida de qual _template_ se quer herdar.
+2. Modifique o template filho, por exemplo o `home.html`, criando os blocos com os mesmos nomes daqueles criados no _template_ herdado de acordo com a sintaxe abaixo.
+
+> **Anota aí 📝:** para que a herança aconteça é obrigatório que o `{% extends 'nome-do-template.html' %}` seja a primeira tag de template que aparece no arquivo.
+
+```html
+<!-- events/templates/home.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+  Primeiro Template
+{% endblock %}
+
+{% block content %}
+  <h1> Meu primeiro template usando Django! </h1>
+{% endblock %}
+```
+
+Note que, ao invés de toda a estrutura base do HTML, você inclui as tags do template base e as preenche com o HTML que quiser. Ao rodar sua aplicação, verá que tudo continua funcionando, ou seja, a herança foi feita com sucesso! 👏
+
+## Criando o _model_ `Event`
+
+Antes de exibir a lista de eventos no _template_, é importante definir o modelo que será usado para representá-los. Eis ele abaixo:
+
+```python
+# events/models.py
+from django.db import models
+
+
+class Event(models.Model):
+    TYPE_CHOICES = (
+        ('C', 'Conference'),
+        ('S', 'Seminar'),
+        ('W', 'Workshop'),
+        ('O', 'Other'),
+    )
+
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    date = models.DateTimeField()
+    location = models.CharField(max_length=200)
+    event_type = models.CharField(max_length=50, choices=TYPE_CHOICES)
+    is_remote = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='events/img', blank=True)
+
+    def __str__(self): # O método __str__ é sobrescrito para indicar como será a visualização do objeto
+        return f'{self.title} - {self.date} - {self.location}' # Título do evento - Data - Local
+```
+
+A tabela `event` ao ser criada no banco terá 8 colunas, sendo elas:
+
+- `id`: inteiro e chave primária única pro evento (que não precisa ser explicitamente declarado no modelo);
+- `title`: texto com no máximo 200 caracteres;
+- `description`: texto sem limitação de caracteres;
+- `date`: data e hora do evento;
+- `location`: texto com no máximo 200 caracteres;
+- `event_type`: texto com no máximo 50 caracteres e que só pode assumir os valores `C`, `S`, `W` ou `O` (ao usar o parâmetro choices, o Django faz a validação se o valor inserido é um dos valores permitidos);
+- `is_remote`: booleano (True ou False) que indica se o evento é remoto ou não;
+- `image`: imagem que será salva na pasta `{CAMINHO-DE-MÍDIA}/events/img` (o caminho de mídia pode ser definido no arquivo `settings.py`)
+
+|![Detalhes da tabela event pelo workbench](https://content-assets.betrybe.com/prod/64465619-fb06-4e3c-b7d2-08de3a9f7c33-Detalhes%20da%20tabela%20event%20pelo%20workbench.png)|
+|---|
+|Detalhes da tabela event pelo workbench|
+
+> **Relembrando 🧠:** quando há um campo imagem é preciso fazer a instalação do módulo Pillow. Para isso, basta executar o comando `pip install Pillow` no terminal. **Relembrando 🧠:** depois de definir o modelo que será usado, crie as _migrations_ e logo depois migre-as para o banco. Para isso, execute `python3 manage.py makemigrations` e `python3 manage.py migrate` no terminal.
+
+## Renderizando os eventos no _template_
+
+Toda função que renderiza um _template_ usando o método _render_, do Django, é capaz também de fornecer um _contexto_ para esse _template_. O termo _contexto_ aqui se refere a um dicionário (`dict`), que pode ser construído dentro da função e passado para o _template_ como terceiro parâmetro do método _render_.
+
+Todas as chaves do contexto podem ser acessadas diretamente pelo _template_ através da sintaxe `{{ chave }}`. Assim, o _template_ fará a renderização do valor que estava associado à chave. Modifique a função `index` do arquivo `events/views.py` para que ela fique assim:
+
+```python
+# events/views.py
+from django.shortcuts import render
+
+
+def index(request):
+    context = {"company": "Trybe"}
+    return render(request, 'home.html', context)
+```
+
+Modifique também seu _template_ `home.html` para renderizar o valor da chave `company` do contexto:
+
+```html
+<!-- events/templates/home.html -->
+ {% extends 'base.html' %}
+
+ {% block title %}
+   Primeiro Template
+ {% endblock %}
+
+ {% block content %}
+     <h1> Meu primeiro template usando Django! </h1>
+     <h2> {{ company }} </h2>
+ {% endblock %}
+```
+
+As modificações feitas acima farão com que o template renderize o valor da chave `company` do contexto, que aqui, é a palavra `Trybe`. Ao atualizar a aplicação você terá:
+
+## Trabalhando com elementos do banco usando Python
+
+Você percebeu que o modelo `Event` herda de `models.Model`? Todas as classes que fazem essa mesma herança são usadas para representar tabelas do banco de dados. Pode não parecer importante, mas isso mostra o vínculo entre essa classe e a sua própria tabela no banco.
+
+Além de representarem tabelas do banco, todas as classes que herdam de `models.Model` possuem um atributo chamado `objects`. Esse atributo permite a interação direta com o banco de dados usando a própria sintaxe do Python. Através desse atributo você pode criar novas entradas no banco, fazer consultas e até mesmo aplicar filtros em uma consulta. Já tivemos um gostinho disso no começo da seção.
+
+Vamos ver na prática? 🤓
+
+Execute o comando `python3 manage.py shell` no terminal, no mesmo diretório do arquivo `manage.py`. Esse comando abre o shell do Django já carregando suas configurações e permitindo usar o ORM do framework. Execute os comandos abaixo, linha a linha, para entender como podemos trabalhar com o banco de dados usando a sintaxe do Python:
+
+```python
+from events.models import Event # importa o modelo Event
+
+Event.objects.all() # retorna todos os eventos do banco. Se você não criou nenhum, o retorno será um QuerySet vazio
+
+Event.objects.create(title='Conferência de Django', description='Evento massa sobre Django', date='2023-09-29 12:00:00-03:00', location='São Paulo', event_type='C', is_remote=False) # cria um novo evento no banco
+
+Event.objects.all() # retorna todos os eventos do banco. Agora o retorno será um QuerySet com um evento a mais
+
+Event.objects.create(title='Django Workshop', description='Workshop que acontece semestralmente sobre Django', date='2024-10-02 15:30:00-03:00', location='Web', event_type='W', is_remote=True) # cria outro evento no banco
+
+Event.objects.filter(is_remote=True) # retorna apenas os eventos do banco que são remotos
+
+Event.objects.filter(event_type='W') # retorna apenas os eventos do banco que são workshops
+
+Event.objects.filter(event_type='C', is_remote=False) # retorna apenas os eventos do banco que são conferências e presenciais, simultaneamente
+
+Event.objects.filter(date__year=2024) # retorna apenas os eventos do banco que acontecem em 2024
+
+Event.objects.filter(date__range=['2023-01-01', '2024-12-31']) # retorna apenas os eventos do banco que acontecem entre 2023 e 2024
+```
+
+São muitas as possibilidades! 🤯
+
+Uma segunda maneira de fazer a inserção de elementos no banco de dados é através da instanciação e depois uso do método `save()`. Além disso, quando um objeto do modelo é instanciado podemos também acessar o método `delete()` para removê-lo do banco. Veja só:
+
+```python
+from events.models import Event # importa o modelo Event
+
+Event.objects.all() # <QuerySet [<Event: Conferência de Django - 2023-09-29 15:00:00+00:00 - São Paulo>, <Event: Django Workshop - 2024-10-02 18:30:00+00:00 - Web>]>
+
+evento_1 = Event(title='Django Devs', description='Pessoas fantásticas que usam Django se reunindo em um só lugar', date='2025-07-02 13:30:00-03:00', location='Web', event_type='W', is_remote=True) # instancia um novo evento
+
+evento_1.save() # salva o evento no banco
+
+evento_2 = Event(title='DjangoFest', description='Um festival um pouco menos legal que desenvolver com Django', date='2023-11-22 18:00:00-03:00', location='São Paulo', event_type='C', is_remote=False) # instancia outro evento
+
+evento_2.save() # salva o evento no banco
+
+Event.objects.all() # <QuerySet [<Event: Conferência de Django - 2023-09-29 15:00:00+00:00 - São Paulo>, <Event: Django Workshop - 2024-10-02 18:30:00+00:00 - Web>, <Event: Django Devs - 2025-07-02 16:30:00+00:00 - Web>, <Event: DjangoFest - 2023-11-22 21:00:00+00:00 - São Paulo>]>
+
+evento_3 = Event(title='DJ ANGO', description='Conheça a mais nova sensação musical.', date='2027-06-19 20:00:00-03:00', location='São Paulo', event_type='C', is_remote=False) # instancia um evento idêntico ao anterior
+
+evento_3.save() # salva o evento no banco
+
+Event.objects.all() # <QuerySet [<Event: Conferência de Django - 2023-09-29 15:00:00+00:00 - São Paulo>, <Event: Django Workshop - 2024-10-02 18:30:00+00:00 - Web>, <Event: Django Devs - 2025-07-02 16:30:00+00:00 - Web>, <Event: DjangoFest - 2023-11-22 21:00:00+00:00 - São Paulo>, <Event: DJ ANGO - 2027-06-19 23:00:00+00:00 - São Paulo>]>
+
+evento_3.delete() # remove o evento do banco
+
+Event.objects.all() # <QuerySet [<Event: Conferência de Django - 2023-09-29 15:00:00+00:00 - São Paulo>, <Event: Django Workshop - 2024-10-02 18:30:00+00:00 - Web>, <Event: Django Devs - 2025-07-02 16:30:00+00:00 - Web>, <Event: DjangoFest - 2023-11-22 21:00:00+00:00 - São Paulo>]>
+```
+
+## Para fixar
+
+Adicione mais 1 entrada no banco de dados, dentro da tabela `events` utilizando cada um dos métodos mostrados.
+
+## Renderizando os eventos no _template_
+
+Agora sim! Finalmente será possível renderizar os eventos no _template_. Para isso, precisamos passar todos os eventos que estão no banco como contexto para o _template_. Modifique o contexto da função `index` no arquivo `views.py` para que exista uma chave `events` cujo valor será uma consulta com todos os eventos que estão cadastrados no banco de dados:
+
+```python
+# events/views.py
+from events.models import Event
+from django.shortcuts import render
+
+
+def index(request):
+    context = {"company": "Trybe", "events": Event.objects.all()}
+    return render(request, 'home.html', context)
+```
+
+Agora, adicione uma segunda tag `h2` no _template_ renderizando a chave `events`:
+
+```html
+<!-- events/templates/home.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+  Primeiro Template
+{% endblock %}
+
+{% block content %}
+    <h1> Meu primeiro template usando Django! </h1>
+    <h2> {{ company }} </h2>
+    <h2> {{ events }} </h2>
+{% endblock %}
+```
+
+|![Print da página home com eventos renderizados](https://content-assets.betrybe.com/prod/5f572d81-7bf9-495d-9f3b-924c877724a5-Print%20da%20p%C3%A1gina%20home%20com%20eventos%20renderizados.png)|
+|---|
+|Print da página home com eventos renderizados|
+
+A visualização dos eventos ainda não está muito amigável, não é mesmo? 🙁 Isso acontece porque o retorno de `Event.objects.all()` é uma consulta (`QuerySet`), que pode ter 0, 1, 2, … n elementos. Para tornar essa visualização mais amigável é necessário iterar pelos elementos que existem na consulta e renderizar cada um deles individualmente.
+
+A iteração pode ser feita usando a tag de _template_ `{% for %}`, cuja sintaxe é muito semelhante à sintaxe do Python, com a diferença que você precisará indicar no _template_ onde o `for` se encerra com a `tag de _template_` `{% endfor %}`:
+
+```html
+<!-- events/templates/home.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+  Primeiro Template
+{% endblock %}
+
+{% block content %}
+     <h1> Meu primeiro template usando Django! </h1>
+     <h2> {{ company }} </h2>
+     {% for event in events %}
+         <p> {{ event }} </p>
+     {% endfor %}
+{% endblock %}
+```
+
+A sintaxe acima permite que, dentro do _template_, seja feita uma iteração sobre cada um dos eventos presentes no contexto. Para cada elemento da iteração, é criada uma nova tag `p` renderizando aquele evento em específico.
+
+|![Print da página home com eventos depois da iteração](https://content-assets.betrybe.com/prod/5f572d81-7bf9-495d-9f3b-924c877724a5-Print%20da%20p%C3%A1gina%20home%20com%20eventos%20depois%20da%20itera%C3%A7%C3%A3o.png)|
+|---|
+|Print da página home com eventos depois da iteração|
+
+Já imaginou o que aconteceria se a consulta não tivesse nenhum elemento? 🤔 A resposta é: nada! Em uma consulta vazia não haverá nenhum evento para renderizar e você deve concordar que isso também não é muito amigável! 😅
+
+Para resolver isso vamos usar a `tag de _template_` `{% empty %}` dentro do `for`, ela indicará o que queremos mostrar na tela caso não exista nenhum elemento na consulta que estamos fazendo:
+
+```html
+<!-- events/templates/home.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+  Primeiro Template
+{% endblock %}
+
+{% block content %}
+    <h1> Meu primeiro template usando Django! </h1>
+    <h2> {{ company }} </h2>
+    {% for event in events %}
+       <p> {{ event }} </p>
+    {% empty %}
+       <p> Não existem eventos cadastrados </p>
+    {% endfor %}
+{% endblock %}
+```
+
+Agora sim! 🎉🎉🎉 Ainda da para melhorar um pouquinho a visualização dos eventos, mas espere um pouco para fazer isso. Antes, vamos à implementação da visualização dos detalhes de um evento específico. 🤓
