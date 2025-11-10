@@ -1,15 +1,15 @@
-<!--events/templates/home.html-->
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!-- events/templates/home.html -->
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Primeiro Template</title>
-</head>
+{% block title %}
+Primeiro Template
+{% endblock %}
 
-<body>
-    <h1> Meu primeiro template usando Django! </h1>
-</body>
-
-</html>
+{% block content %}
+<h1> Meu primeiro template usando Django! </h1>
+<h2> {{ company }} </h2>
+{% for event in events %}
+<p> {{ event }} </p>
+{% empty %}
+{% endfor %}
+{% endblock %}
