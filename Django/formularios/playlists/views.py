@@ -2,7 +2,7 @@
 
 from django.shortcuts import redirect, render
 from formularios.playlists.models import Music, Singer
-from playlists.forms import CreateMusicForm, CreateSingerForm
+from playlists.forms import CreateMusicForm, CreateMusicModelForm, CreateSingerForm
 
 
 def music(request):
@@ -36,3 +36,21 @@ def singer(request):
     context = {"form": form}
 
     return render(request, "singer.html", context)
+
+
+# playlists/views.py
+def create_music(request):
+    # form = CreateMusicForm()
+    form = CreateMusicModelForm()
+
+    if request.method == "POST":
+        # form = CreateMusicForm(request.POST)
+        form = CreateMusicModelForm(request.POST)
+
+        if form.is_valid():
+            Music.objects.create(**form.cleaned_data)
+            return redirect("home-page")
+
+    context = {"form": form}
+
+    return render(request, "index.html", context)

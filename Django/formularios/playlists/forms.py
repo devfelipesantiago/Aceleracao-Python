@@ -1,6 +1,7 @@
 # playlists/forms.py
 from django import forms
 
+from formularios.playlists.models import Music
 from formularios.playlists.validators import validate_music_length, validate_name
 
 
@@ -28,3 +29,20 @@ class CreatePlaylistForm(forms.Form):
 
 class CreateSingerForm(forms.Form):
     name = forms.CharField(max_length=50)
+
+
+class CreateMusicModelForm(forms.ModelForm):
+    class Meta:
+        model = Music
+        fields = "__all__"
+        # excluded = ['campo a ser excluido']
+        labels = {
+            "name": "Nome da música",
+            "recorded_at": "Data de gravação",
+            "length_in_seconds": "Duração em segundos",
+        }
+        widgets = {
+            "recorded_at": forms.DateInput(
+                attrs={"type": "date", "value": "2023-07-06"}
+            )
+        }
